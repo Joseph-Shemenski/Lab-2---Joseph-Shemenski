@@ -2,50 +2,36 @@
  
 string1: .ascii "foo"
 string2: .ascii "bar"
-diff_count: .byte 0b0000
-count: .byte 0b0000
 len = . - string1
 msg1: .ascii "the bit difference is "
 len1 = . - msg1
-len3 = . - diff_count
+
 
 
 .section .text
 .globl _start
 _start:
-    movl $string1, %esi 
-    movl $string2, %edi
-    movl count, %edx
-    movl $len, %ecx
+    movl $string1, %edi 
+    movl $string2, %esi
+    movl $0, %ebx # holds the hamming distance
+    movl $0, %edx # holds the loop amount 
+    movl $len, %ecx # holds the max amount of loops
+
+    xor %edi, %edi
+    xor %edi, %esi
 
 repeat:
-    test %edx, %esi 
-    jz is_zero
-    jmp is_one
+    shr $1, %edi
+    incl %edx 
+    jc is_diff
     cmpl %edx, %ecx
-    jne repeat
+    jee print
 
-
-is_zero:
-    test %edx, %edi
-    jz is_same
-    jmp is_diff
-
-is_one:
-    test %edx, %edi
-    jz is_diff
-    jmp is_same
-
-is_same:
-    incb diff_count
-    incl %edx
-    incl %edi
-    incl %esi
 
 is_diff:
-    incl %edx
-    incl %esi
+    incl %ebx
     incl %edi
+    incl %esi
 
 print:
    
